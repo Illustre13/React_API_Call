@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice} from '@reduxjs/toolkit';
-import { fetchApiCategories } from './JokesAction';
+import { fetchApiCategories, fetchApiRandom } from './JokesAction';
 
   interface JokesInfo {
     state: string;
@@ -11,7 +11,10 @@ import { fetchApiCategories } from './JokesAction';
     url: string;
     value: string;
     isLoading: boolean;
+    randomJoke: [] | null;
     categoryTypes: string;
+    categoryError: boolean;
+    randomError: boolean;
   }
 
   const initialState: JokesInfo = {
@@ -24,7 +27,10 @@ import { fetchApiCategories } from './JokesAction';
     url: '',
     value: '',
     isLoading : false,
+    randomJoke : null,
     categoryTypes: '',
+    categoryError: false,
+    randomError: false,
   };
   const jokesSlice = createSlice({
     name: 'categories',
@@ -43,9 +49,23 @@ import { fetchApiCategories } from './JokesAction';
         })
         .addCase(fetchApiCategories.rejected, (state) => {
           state.state = 'REJECTED';
+            state.categoryError = true;
+        })
+        .addCase(fetchApiRandom.pending, (state) => {
+            state.state = 'PENDING';
+            state.isLoading = true;
+          })
+          .addCase(fetchApiRandom.fulfilled, (state, action: PayloadAction<any>) => {
+            state.state = 'FULFILLED';
             state.isLoading = false;
-         
-        });
+            state.randomJoke = action.payload;
+          })
+          .addCase(fetchApiRandom.rejected, (state) => {
+            state.state = 'REJECTED';
+              state.randomError = true;
+           
+          });
+        
     },
   });
 
